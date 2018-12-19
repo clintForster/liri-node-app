@@ -74,9 +74,16 @@ inquirer.prompt([
         ]).then(function (response) {
             var song = response.input;
             if (song === '' || song === ' ') {
-                spotify.request("https://api.spotify.com/v1/search/q='The%20Sign'&type=track/8d950a83736a4cafb9c3a4e20768f9a8").then(function (response) {
-                    console.log(response);
+
+                spotify.search({ type: 'track', query: 'The Sign Ace of Base' }, function (err, response) {
+                    if (err) {
+                        console.log(err);
+                    }
+
+                    console.log(response.tracks.items[0].name);
+
                 });
+
             } else {
                 console.log(song);
                 spotify.search({ type: 'track', query: song }, function (err, response) {
@@ -84,8 +91,6 @@ inquirer.prompt([
                         console.log(err);
                     }
                     console.log(response.tracks.items[0].name);
-
-                
 
             });
         }
