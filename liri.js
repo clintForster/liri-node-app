@@ -133,7 +133,9 @@ function movieThis() {
             console.log("\nTitle: " + info.Title);
             console.log("Release Year: " + info.Year);
             console.log("IMDB Rating: " + info.imdbRating);
-            console.log("Rotten Tomatoes Rating: " + info.Ratings[1].Value);
+            if (info.Ratings[1] !== undefined) {
+                console.log("Rotten Tomatoes Rating: " + info.Ratings[1].Value);
+            }
             console.log("Produced in: " + info.Country);
             console.log("Language: " + info.Language);
             console.log("Plot: " + info.Plot);
@@ -158,12 +160,27 @@ function doWhatItSays() {
 
         switch (splitArray[0]) {
             case 'concert-this':
-                concertThis();
+            
+                var artist = splitArray[1].slice(1,-1);
+                if (artist === "" || artist === " ") {
+                    console.log("\nSorry, that returned 0 results.");
+                } else {
+                axios.get("https://rest.bandsintown.com/artists/" + artist + "/events?app_id=bb4c8814320b726f2b5e8e9f45cde226")
+                    .then(function (response) {
+                        if (response.data[0] !== undefined) {
+                            var venue = response.data[0].venue;
+                            var dateTime = response.data[0].datetime;
+                            var date = moment(dateTime).format('MM/DD/YYYY');
+                            console.log("\nVenue: " + venue.name + "\nCity: ", venue.city + ", " + venue.region + "\nDate: ", date + "\n");
+                        } else {
+                            console.log("\nSorry, that returned 0 results.");
+                        }
+                    });
+                }
+        
                 break;
             case 'spotify-this-song':
-            song = splitArray[1]
-            console.log(song.trim('"'));
-            (song) => {
+            song = splitArray[1].slice(1,-1);
                 if (song === '' || song === ' ') {
         
                     spotify.search({ type: 'track', query: 'The Sign Ace of Base' }, function (err, response) {
@@ -177,6 +194,7 @@ function doWhatItSays() {
                         console.log("Preview: " + data.preview_url);
                         console.log("Album: " + data.album.name);
                     });
+                    find();
         
                 } else if (response === undefined || response === null) {
                     console.log("\nSorry, that returned 0 results.");
@@ -193,14 +211,33 @@ function doWhatItSays() {
                     });
                 }
         
-            }
                 break;
             case 'movie-this':
-                movieThis();
+
+                var movie = splitArray[1].slice(1,-1);
+                if (movie === "" || movie === " ") {
+                    movie = "Mr.Nobody";
+                } else if (movie === undefined || movie === null) {
+                    console.log("\nSorry, that returned 0 results.");
+                }
+                axios.get("http://www.omdbapi.com/?apikey=trilogy&t=" + movie).then(function (response) {
+                    var info = response.data;
+                    console.log("\nTitle: " + info.Title);
+                    console.log("Release Year: " + info.Year);
+                    console.log("IMDB Rating: " + info.imdbRating);
+                    console.log("Rotten Tomatoes Rating: " + info.Ratings[1].Value);
+                    console.log("Produced in: " + info.Country);
+                    console.log("Language: " + info.Language);
+                    console.log("Plot: " + info.Plot);
+                    console.log("Cast: " + info.Actors);
+                });
+        
                 break;
+
             case 'do-what-it-says':
                 doWhatItSays();
                 break;
+
         }
 
 
